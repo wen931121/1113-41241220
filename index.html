@@ -47,17 +47,29 @@
 
                     // 用經過處理的電子郵件作為資料庫的識別碼
                     const userRef = ref(database, 'users/' + sanitizedEmail);
-                    const currentTime = new Date().toLocaleString(); // 取得當前時間
 
-                    set(userRef, {
-                        email: userEmail,
-                        name: userName,
-                        photoURL: userPhoto,
-                        lastLogin: currentTime // 儲存最後登入時間
-                    }).then(() => {
-                        alert('註冊成功，資料已儲存到資料庫！');
+                    // 檢查該用戶是否已註冊
+                    get(userRef).then((snapshot) => {
+                        if (snapshot.exists()) {
+                            // 用戶已註冊，顯示提示訊息
+                            alert('已註冊，請登入');
+                        } else {
+                            // 用戶未註冊，執行註冊流程
+                            const currentTime = new Date().toLocaleString(); // 取得當前時間
+
+                            set(userRef, {
+                                email: userEmail,
+                                name: userName,
+                                photoURL: userPhoto,
+                                lastLogin: currentTime // 儲存最後登入時間
+                            }).then(() => {
+                                alert('註冊成功，資料已儲存到資料庫！');
+                            }).catch((error) => {
+                                alert('儲存資料時發生錯誤: ' + error.message);
+                            });
+                        }
                     }).catch((error) => {
-                        alert('儲存資料時發生錯誤: ' + error.message);
+                        alert('讀取資料時發生錯誤: ' + error.message);
                     });
                 })
                 .catch((error) => {
